@@ -63,6 +63,15 @@ float interpB(const QColor cols[2][2], float x, float y)
         + x*y * cols[1][1].blueF();
 }
 
+inline
+float interpA(const QColor cols[2][2], float x, float y)
+{
+    return (1-x)*(1-y) * cols[0][0].alphaF()
+        + x*(1-y) * cols[1][0].alphaF()
+        + y*(1-x) * cols[0][1].alphaF()
+        + x*y * cols[1][1].alphaF();
+}
+
 QColor Interpolate_sV::interpolate(const QImage& in, float x, float y)
 {
 #ifdef DEBUG_I
@@ -83,7 +92,8 @@ QColor Interpolate_sV::interpolate(const QImage& in, float x, float y)
     QColor out = QColor::fromRgbF(
                                   interpR(carr, dx, dy),
                                   interpG(carr, dx, dy),
-                                  interpB(carr, dx, dy)
+                                  interpB(carr, dx, dy),
+                                  interpA(carr, dx, dy)
                                  );
     return out;
 }
@@ -132,7 +142,7 @@ void Interpolate_sV::twowayFlow(const QImage &left, const QImage &right, const F
 #endif
 
     QColor colOut, colLeft, colRight;
-    float r,g,b;
+    float r,g,b,a;
     Interpolate_sV::Movement forward, backward;
 
     for (int y = 0; y < left.height(); y++) {
@@ -162,12 +172,14 @@ void Interpolate_sV::twowayFlow(const QImage &left, const QImage &right, const F
             r = (1-pos)*colLeft.redF() + pos*colRight.redF();
             g = (1-pos)*colLeft.greenF() + pos*colRight.greenF();
             b = (1-pos)*colLeft.blueF() + pos*colRight.blueF();
+            a = (1-pos)*colLeft.alphaF() + pos*colRight.alphaF();
             colOut = QColor::fromRgbF(
                                       CLAMP1(r),
                                       CLAMP1(g),
-                                      CLAMP1(b)
+                                      CLAMP1(b),
+                                      CLAMP1(a)
                                       );
-            output.setPixel(x,y, colOut.rgb());
+            output.setPixel(x,y, colOut.rgba());
         }
     }
 }

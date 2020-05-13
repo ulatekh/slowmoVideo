@@ -93,6 +93,7 @@ int VideoFFMPEG::exportFrames(QString filepattern,int first,RenderTask_sV *progr
 		args << "-start_number" << QString::number(first);
 	args << "-i" << filepattern;
 	args << "-vcodec" << m_vcodec;
+	args << "-pix_fmt" << "yuva444p";
 	args << "-s" << QString("%1x%2").arg(QString::number(mWidth), QString::number(mHeight));
 	args << m_filename;
    
